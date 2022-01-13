@@ -50,6 +50,7 @@ ul {
 }
 .search-form__input {
   width: 320px;
+  height: 40px;
   border-radius: 5px;
   padding: 7px;
   box-shadow: none;
@@ -58,6 +59,12 @@ ul {
 .button {
   border: none;
   border-radius: 5px;
-
+  width: 40px;
+  height: 40px;
   background-color: rgb(230, 230, 230);
+  background-image: url(..//images/search.svg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 17px;
+  fill: rgba(75, 72, 72, 0.849);
 }
