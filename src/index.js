@@ -1,5 +1,6 @@
 import './sass/main.scss';
 import axios from 'axios';
+import cardRender from '../src/cardRender.hbs';
 
 const BASE_URL = 'https://pixabay.com/api/';
 
@@ -11,26 +12,29 @@ const queryParameters = {
   safesearch: true,
 };
 
+const { key, q, image_type, orientation, safesearch } = queryParameters;
+const searchParams = 'webformatURL,largeImageURL,tags,likes,views,comments,downloads';
 let url;
 
 const refs = {
   inputSearchForm: document.querySelector('.search-form__input'),
   buttonSearchForm: document.querySelector('.button'),
   seachingForm: document.querySelector('.search-form'),
+  galleryOfImages: document.querySelector('.gallery'),
 };
 
 const searchFormHandler = event => {
   event.preventDefault();
-  queryParameters.q = refs.inputSearchForm.value;
-  url = `${BASE_URL}?key=${queryParameters.key}&q=${queryParameters.q}&image_type=${queryParameters.image_type}&orientation=${queryParameters.orientation}&safesearch=${queryParameters.safesearch}`;
-  console.log(getImage(url));
+  queryParameters.q = refs.inputSearchForm.value.trim();
+  const keys = `${key}&q=${queryParameters.q}&image_type=${image_type}&orientation=${orientation}&safesearch=${safesearch}`;
+  url = `${BASE_URL}?key=${keys}?fields=${searchParams}`;
+  getImage(url).then(response => (refs.galleryOfImages.innerHTML = cardRender(response.data.hits)));
 };
 
 async function getImage(url) {
   try {
     const response = await axios.get(url);
-
-    console.log(response);
+    return response;
   } catch (error) {
     console.error(error);
   }
