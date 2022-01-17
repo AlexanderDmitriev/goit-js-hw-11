@@ -1,6 +1,9 @@
 import './sass/main.scss';
 import axios from 'axios';
 import cardRender from '../src/cardRender.hbs';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const BASE_URL = 'https://pixabay.com/api/';
 
@@ -28,16 +31,39 @@ const searchFormHandler = event => {
   queryParameters.q = refs.inputSearchForm.value.trim();
   const keys = `${key}&q=${queryParameters.q}&image_type=${image_type}&orientation=${orientation}&safesearch=${safesearch}`;
   url = `${BASE_URL}?key=${keys}?fields=${searchParams}`;
-  getImage(url).then(response => (refs.galleryOfImages.innerHTML = cardRender(response.data.hits)));
+
+  getImage(url)
+    .then(response => {
+      if (response != undefined) {
+        if (response.data.totalHits > 0) {
+          refs.galleryOfImages.innerHTML = cardRender(response.data.hits);
+        }
+      } else {
+        refs.galleryOfImages.innerHTML = '';
+        throw new Error('Sorry, there are no images matching your search query. Please try again.');
+      }
+    })
+    .catch(error => Notify.failure(error.message));
 };
 
 async function getImage(url) {
   try {
     const response = await axios.get(url);
-    return response;
+
+    console.log(response.data);
+    if (response.data.totalHits > 0) {
+      return response;
+    }
+    throw new Error('Sorry, there are no images matching your search query. Please try again.');
   } catch (error) {
-    console.error(error);
+    error => Notify.failure(error.message);
   }
 }
 
 refs.seachingForm.addEventListener('submit', searchFormHandler);
+
+let lightbox = new SimpleLightbox('.gallery a');
+
+lightbox.on('show.simplelightbox', function () {
+  lightbox.next();
+});
