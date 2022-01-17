@@ -46,10 +46,17 @@ const searchFormHandler = event => {
     .catch(error => Notify.failure(error.message));
 };
 
+const galleryModal = new SimpleLightbox('.gallery a', {
+  captionsData: 'alt',
+  captionType: 'alt',
+  captionDelay: 200,
+  captionPosition: 'bottom',
+});
+
 async function getImage(url) {
   try {
     const response = await axios.get(url);
-
+    galleryModal.refresh();
     console.log(response.data);
     if (response.data.totalHits > 0) {
       return response;
@@ -61,9 +68,3 @@ async function getImage(url) {
 }
 
 refs.seachingForm.addEventListener('submit', searchFormHandler);
-
-let lightbox = new SimpleLightbox('.gallery a');
-
-lightbox.on('show.simplelightbox', function () {
-  lightbox.next();
-});
