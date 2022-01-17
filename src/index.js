@@ -37,6 +37,7 @@ const searchFormHandler = event => {
       if (response != undefined) {
         if (response.data.totalHits > 0) {
           refs.galleryOfImages.innerHTML = cardRender(response.data.hits);
+          galleryModal.refresh();
         }
       } else {
         refs.galleryOfImages.innerHTML = '';
@@ -56,7 +57,7 @@ const galleryModal = new SimpleLightbox('.gallery a', {
 async function getImage(url) {
   try {
     const response = await axios.get(url);
-    galleryModal.refresh();
+
     console.log(response.data);
     if (response.data.totalHits > 0) {
       return response;
