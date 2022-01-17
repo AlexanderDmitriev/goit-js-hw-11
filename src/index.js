@@ -1,9 +1,11 @@
 import './sass/main.scss';
 import axios from 'axios';
-import cardRender from '../src/cardRender.hbs';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+import cardRender from '../src/cardRender.hbs';
+import { getImage } from './js/getImage';
+import { markup } from './js/markup';
 
 const BASE_URL = 'https://pixabay.com/api/';
 
@@ -18,54 +20,41 @@ const queryParameters = {
 const { key, q, image_type, orientation, safesearch } = queryParameters;
 const searchParams = 'webformatURL,largeImageURL,tags,likes,views,comments,downloads';
 let url;
+let page;
+let perPage = 40;
 
-const refs = {
+export const refs = {
   inputSearchForm: document.querySelector('.search-form__input'),
   buttonSearchForm: document.querySelector('.button'),
   seachingForm: document.querySelector('.search-form'),
   galleryOfImages: document.querySelector('.gallery'),
+  loadMoreButton: document.querySelector('.load-more'),
 };
 
 const searchFormHandler = event => {
   event.preventDefault();
+  page = 1;
   queryParameters.q = refs.inputSearchForm.value.trim();
   const keys = `${key}&q=${queryParameters.q}&image_type=${image_type}&orientation=${orientation}&safesearch=${safesearch}`;
-  url = `${BASE_URL}?key=${keys}?fields=${searchParams}`;
+  const pagination = `per_page=${perPage}&page=${page}`;
+  url = `${BASE_URL}?key=${keys}&fields=${searchParams}&${pagination}`;
 
-  getImage(url)
-    .then(response => {
-      if (response != undefined) {
-        if (response.data.totalHits > 0) {
-          refs.galleryOfImages.innerHTML = cardRender(response.data.hits);
-          galleryModal.refresh();
-        }
-      } else {
-        refs.galleryOfImages.innerHTML = '';
-        throw new Error('Sorry, there are no images matching your search query. Please try again.');
-      }
-    })
-    .catch(error => Notify.failure(error.message));
+  markup(url, 'new');
 };
 
-const galleryModal = new SimpleLightbox('.gallery a', {
-  captionsData: 'alt',
-  captionType: 'alt',
+export const galleryModal = new SimpleLightbox('.gallery a', {
   captionDelay: 200,
-  captionPosition: 'bottom',
 });
 
-async function getImage(url) {
-  try {
-    const response = await axios.get(url);
+const loadMoreHandler = event => {
+  page++;
+  queryParameters.q = refs.inputSearchForm.value.trim();
+  const keys = `${key}&q=${queryParameters.q}&image_type=${image_type}&orientation=${orientation}&safesearch=${safesearch}`;
+  const pagination = `per_page=${perPage}&page=${page}`;
+  url = `${BASE_URL}?key=${keys}&fields=${searchParams}&${pagination}`;
 
-    console.log(response.data);
-    if (response.data.totalHits > 0) {
-      return response;
-    }
-    throw new Error('Sorry, there are no images matching your search query. Please try again.');
-  } catch (error) {
-    error => Notify.failure(error.message);
-  }
-}
+  markup(url, 'more');
+};
 
 refs.seachingForm.addEventListener('submit', searchFormHandler);
+refs.loadMoreButton.addEventListener('click', loadMoreHandler);
