@@ -128,3 +128,26 @@ ul {
 .info-item {
   text-decoration: none;
 }
+.load {
+  display: flex;
+  justify-content: center;
+}
+
+.load-more {
+  border: none;
+  border-radius: 5px;
+  background-color: blue;
+  color: azure;
+  padding: 10px 20px;
+  font-size: 18px;
+
+  &:hover,
+  &:focus {
+    background-color: rgb(60, 60, 235);
+    box-shadow: 1px 1px 5px grey;
+  }
+}
+
+.is-hidden {
+  display: none;
+}

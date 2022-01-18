@@ -1,10 +1,10 @@
 import axios from 'axios';
-
+import { perPage } from '..';
+export let res;
 export async function getImage(url) {
   try {
     const response = await axios.get(url);
-
-    console.log(response.data);
+    res = response.data.totalHits;
     if (response.data.totalHits > 0) {
       return response;
     }

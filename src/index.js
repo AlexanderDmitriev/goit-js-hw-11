@@ -6,6 +6,7 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 import cardRender from '../src/cardRender.hbs';
 import { getImage } from './js/getImage';
 import { markup } from './js/markup';
+import { res } from './js/getImage';
 
 const BASE_URL = 'https://pixabay.com/api/';
 
@@ -21,7 +22,7 @@ const { key, q, image_type, orientation, safesearch } = queryParameters;
 const searchParams = 'webformatURL,largeImageURL,tags,likes,views,comments,downloads';
 let url;
 let page;
-let perPage = 40;
+export let perPage = 40;
 
 export const refs = {
   inputSearchForm: document.querySelector('.search-form__input'),
@@ -30,6 +31,13 @@ export const refs = {
   galleryOfImages: document.querySelector('.gallery'),
   loadMoreButton: document.querySelector('.load-more'),
 };
+
+function toggleModal() {
+  refs.loadMoreButton.classList.remove('is-hidden');
+}
+function addingHidden() {
+  refs.loadMoreButton.classList.add('is-hidden');
+}
 
 const searchFormHandler = event => {
   event.preventDefault();
@@ -40,6 +48,7 @@ const searchFormHandler = event => {
   url = `${BASE_URL}?key=${keys}&fields=${searchParams}&${pagination}`;
 
   markup(url, 'new');
+  toggleModal();
 };
 
 export const galleryModal = new SimpleLightbox('.gallery a', {
@@ -54,6 +63,11 @@ const loadMoreHandler = event => {
   url = `${BASE_URL}?key=${keys}&fields=${searchParams}&${pagination}`;
 
   markup(url, 'more');
+  console.log(Math.ceil(res / perPage));
+  if (Math.ceil(res / perPage) === page) {
+    addingHidden();
+    Notify.info("We're sorry, but you've reached the end of search results.");
+  }
 };
 
 refs.seachingForm.addEventListener('submit', searchFormHandler);
