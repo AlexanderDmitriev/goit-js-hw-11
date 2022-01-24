@@ -70,3 +70,12 @@ const loadMoreHandler = event => {
 
 refs.seachingForm.addEventListener('submit', searchFormHandler);
 refs.loadMoreButton.addEventListener('click', loadMoreHandler);
+
+const scrollHandler = event => {
+  const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+  if (clientHeight + scrollTop >= scrollHeight - 5) {
+    loadMoreHandler(event);
+  }
+};
+
+window.addEventListener('scroll', scrollHandler);
